@@ -1,0 +1,6 @@
+django
+pillow
+psycopg2
+djangorestframework
+django-jazzmin
+# django-encrypted-filefield
