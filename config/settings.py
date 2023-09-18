@@ -18,6 +18,8 @@ INSTALLED_APPS = [
 	# Custom Application
 	'movies.apps.MoviesConfig',
 	'users.apps.UsersConfig',
+	# Third party apps
+	'drf_yasg'
 ]
 
 MIDDLEWARE = [

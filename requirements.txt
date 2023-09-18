@@ -2,5 +2,8 @@ django
 pillow
 psycopg2
 djangorestframework
+drf-yasg
+django-filter
 django-jazzmin
+markdown
 # django-encrypted-filefield
