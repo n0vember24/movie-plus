@@ -1,11 +1,11 @@
 from django.apps import apps
 from django.contrib import auth
+from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.base_user import BaseUserManager
-from django.core.validators import RegexValidator
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.db.models import ImageField, CharField
+from django.core.validators import RegexValidator
+from django.db.models import CharField, ImageField
 from django.utils.translation import gettext_lazy as _
 
 
@@ -130,3 +130,4 @@ class User(AbstractUser):
         db_table = 'auth_user'
         # Add model user into auth's tab
         # app_label = 'auth'
+
