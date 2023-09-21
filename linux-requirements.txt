@@ -1,7 +1,7 @@
 django
-python-dotenv
 pillow
-psycopg2
+psycopg2-binary
+python-dotenv
 djangorestframework
 drf-yasg
 django-filter
