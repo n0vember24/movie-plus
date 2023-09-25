@@ -1,18 +1,22 @@
+from random import randint
+
 from django.apps import apps
 from django.contrib import auth
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import MinLengthValidator as min_length
 from django.core.validators import RegexValidator
 from django.db.models import CharField, ImageField
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 
 class PhoneNumberValidator(RegexValidator):
-    regex = r'^[9|3|7|8][0-9]{8}$'
-    message = 'The phone number must consist of 9 digits and start with 3, 7, 8, 9.'
-    code = 'invalid_phone_number'
+    regex = r"^[9|3|7|8][0-9]{8}$"
+    message = "The phone number must consist of 9 digits and start with 3, 7, 8, 9."
+    code = "invalid_phone_number"
 
 
 class UserManager(BaseUserManager):
@@ -29,11 +33,7 @@ class UserManager(BaseUserManager):
             self.model._meta.app_label, self.model._meta.object_name
         )
         phone_number = GlobalUserModel.normalize_username(phone_number)
-        user = self.model(
-            phone_number=phone_number,
-            email=email,
-            **extra_fields
-        )
+        user = self.model(phone_number=phone_number, email=email, **extra_fields)
         user.password = make_password(password)
         user.save(using=self._db)
         return user
@@ -89,16 +89,14 @@ class User(AbstractUser):
     username_validator = UnicodeUsernameValidator()
 
     phone_number = CharField(
-        _('phone number'),
+        _("phone number"),
         unique=True,
         max_length=9,
         validators=[phone_number_validator],
-        help_text=_(
-            "Required. User's phone number, required 9 characters."
-        ),
+        help_text=_("Required. User's phone number, required 9 characters."),
         error_messages={
             "unique": _("A user with that phone number already exists."),
-        }
+        },
     )
 
     username = CharField(
@@ -113,21 +111,35 @@ class User(AbstractUser):
         validators=[username_validator],
         error_messages={
             "unique": _("A user with that username already exists."),
-        }
+        },
     )
+
     image = ImageField(
-        _('image'), upload_to='users/images/',
-        help_text=_('User\'s profile image'),
-        null=True, blank=True
+        _("image"),
+        upload_to="users/images/",
+        help_text=_("User's profile image"),
+        null=True,
+        blank=True,
+    )
+
+    first_name = CharField(
+        _("first name"), max_length=150, blank=True, validators=[min_length(3)]
+    )
+    last_name = CharField(
+        _("last name"), max_length=150, blank=True, validators=[min_length(3)]
     )
 
     objects = UserManager()
 
-    REQUIRED_FIELDS = []
-    USERNAME_FIELD = 'phone_number'
+    REQUIRED_FIELDS = ["first_name", "last_name"]
+    USERNAME_FIELD = "phone_number"
+
+    def save(self, *args, **kwargs) -> None:
+        self.username = f"{slugify(self.get_full_name())}-{randint(1000, 9999)}"
+        return super().save(*args, **kwargs)
 
     class Meta:
-        db_table = 'auth_user'
-        # Add model user into auth's tab
-        # app_label = 'auth'
+        db_table = "auth_user"
 
+    class Meta:
+        db_table = "auth_user"
